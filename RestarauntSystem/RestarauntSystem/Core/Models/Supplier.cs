@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RestarauntSystem.Core.Models
+{
+    public class Supplier
+    {
+        public int SupplierId { get; set; }
+        public string SupplierName { get; set; }
+        public string ContactPhone { get; set; }
+        public string ContactEmail { get; set; }
+
+        public ICollection<DeliveryItem> DeliveryItems { get; set; }
+        public ICollection<SupplierProduct> SupplierProducts { get; set; }
+    }
+}
