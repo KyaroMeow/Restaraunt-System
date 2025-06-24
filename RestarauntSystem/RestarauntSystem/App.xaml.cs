@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using RestarauntSystem.Infrastructure.Data;
+using RestarauntSystem.WPF;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 
@@ -9,6 +11,7 @@ namespace RestarauntSystem
     /// </summary>
     public partial class App : Application
     {
+        
     }
 
 }

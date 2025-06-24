@@ -9,10 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Core\Services\" />
     <Folder Include="Core\ViewModels\" />
-    <Folder Include="Infrastructure\Repositories\" />
-    <Folder Include="WPF\ViewModel\" />
     <Folder Include="WPF\Converters\" />
     <Folder Include="WPF\Views\" />
   </ItemGroup>
