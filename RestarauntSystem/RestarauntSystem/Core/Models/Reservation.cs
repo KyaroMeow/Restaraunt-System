@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace RestarauntSystem.Core.Models
 {
     public class Reservation
     {
+        [Key]
         public int ReservationId { get; set; }
         public int? CustomerId { get; set; }
         public int? StatusId { get; set; }

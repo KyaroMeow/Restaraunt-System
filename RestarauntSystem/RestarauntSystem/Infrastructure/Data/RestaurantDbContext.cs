@@ -100,7 +100,7 @@ namespace RestarauntSystem.Infrastructure.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Host=localhost;Database=restaurant_db;Username=restaurant_admin;Password=admin1234");
+                optionsBuilder.UseNpgsql("Host=localhost;Database=restaraunt_db;Username=postgres;Password=sa");
             }
         }
     }

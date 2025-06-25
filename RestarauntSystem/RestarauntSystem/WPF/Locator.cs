@@ -21,30 +21,40 @@ namespace RestarauntSystem.WPF
             // 1. Регистрация контекста базы данных
             services.AddDbContext<RestaurantDbContext>(options =>
             {
-                options.UseNpgsql("Host=localhost;Database=restaurant_db;Username=restaurant_admin;Password=admin1234");
+                options.UseNpgsql("Host=localhost;Database=restaraunt_db;Username=postgres;Password=sa");
             });
 
             // 2. Регистрация репозиториев
             services.AddTransient<ICustomerRepository, CustomerRepository>();
-            services.AddTransient<IOrderRepository, OrderRepository>();
-            services.AddTransient<IOrderItemRepository, OrderItemRepository>();
-            services.AddTransient<ITableRepository, TableRepository>();
-            services.AddTransient<IEmployeeRepository, EmployeeRepository>();
-            services.AddTransient<IDishRepository, DishRepository>();
-            services.AddTransient<IReservationRepository, ReservationRepository>();
             services.AddTransient<IDeliveryRepository, DeliveryRepository>();
+            services.AddTransient<IDishCategoryRepository, DishCategoryRepository>();
+            services.AddTransient<IDishRepository, DishRepository>();
+            services.AddTransient<IEmployeeRepository, EmployeeRepository>();
             services.AddTransient<IInventoryRepository, InventoryRepository>();
+            services.AddTransient<IOrderItemRepository, OrderItemRepository>();
+            services.AddTransient<IOrderRepository, OrderRepository>();
+            services.AddTransient<ITableRepository, TableRepository>();
+            services.AddTransient<IPositionRepository, PositionRepository>();
+            services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddTransient<IReservationRepository, ReservationRepository>();
+            services.AddTransient<ISupplierRepository, SupplierRepository>();
+            services.AddTransient<ITableRepository, TableRepository>();
+            services.AddTransient<IWorkScheduleRepository, WorkScheduleRepository>();
+
+
 
             // 3. Регистрация сервисов
-            services.AddTransient<IOrderService, OrderService>();
-            services.AddTransient<IReservationService, ReservationService>();
-            services.AddTransient<IInventoryService, InventoryService>();
-            services.AddTransient<IDishService, DishService>();
+            services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<IDishCategoryService, DishCategoryService>();
+            services.AddTransient<IDishService, DishService>();
+            services.AddTransient<IEmployeeService, EmployeeService>();
+            services.AddTransient<IInventoryService, InventoryService>();
+            services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<IPositionService, PositionService>();
             services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<IReservationService, ReservationService>();
             services.AddTransient<ISupplierService, SupplierService>();
-            services.AddTransient<ICustomerService, CustomerService>();
+            services.AddTransient<ITableService, TableService>();
 
             // 4. Регистрация ViewModels
             services.AddTransient<MainViewModel>();

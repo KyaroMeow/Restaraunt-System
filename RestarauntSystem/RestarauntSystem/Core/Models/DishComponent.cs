@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace RestarauntSystem.Core.Models
 {
+    [Table("dish_components")]
     public class DishComponent
     {
         [ForeignKey("Dish")]

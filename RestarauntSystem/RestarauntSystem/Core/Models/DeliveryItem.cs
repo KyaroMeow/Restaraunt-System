@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace RestarauntSystem.Core.Models
 {
+    [Table("delivery_items")]
     public class DeliveryItem
     {
         [ForeignKey("Delivery")]

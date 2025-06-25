@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace RestarauntSystem.Core.Models
 {
     public class Supplier
     {
+        [Key]
         public int SupplierId { get; set; }
         public string SupplierName { get; set; }
         public string ContactPhone { get; set; }
