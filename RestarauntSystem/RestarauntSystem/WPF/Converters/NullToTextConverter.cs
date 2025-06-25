@@ -8,6 +8,7 @@ namespace RestarauntSystem.WPF.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (parameter == null) return "пусто";
             string[] texts = parameter.ToString().Split('|');
             return value == null ? texts[0] : texts[1];
         }

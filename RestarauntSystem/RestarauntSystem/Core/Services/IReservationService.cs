@@ -14,5 +14,6 @@ namespace RestarauntSystem.Core.Services
         Task<IEnumerable<Reservation>> GetCustomerReservationsAsync(int customerId);
         Task<IEnumerable<Reservation>> GetReservationsByDateAsync(DateTime date);
         Task<Reservation> GetReservationDetailsAsync(int reservationId);
+        Task<IEnumerable<Reservation>> GetAllReservationsAsync();
     }
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace RestarauntSystem.Core.Models
 {
+    [Table("orders")]
     public class Order
     {
         [Key]

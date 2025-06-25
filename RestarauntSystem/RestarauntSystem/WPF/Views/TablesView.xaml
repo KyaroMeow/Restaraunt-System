@@ -4,8 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RestarauntSystem.WPF.Views"
+             xmlns:converter="clr-namespace:RestarauntSystem.WPF.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converter:NullToTextConverter x:Key="StatusToBrushConverter"/>
+    </UserControl.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -13,35 +17,31 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Фильтры -->
+        <!-- Фильтры и кнопки -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0 0 0 10">
             <DatePicker SelectedDate="{Binding ReservationDate}" Margin="0 0 10 0" Width="150"/>
-            <Button Content="Обновить" Command="{Binding LoadTablesCommand}" Margin="0 0 10 0"/>
+            <Button Content="Обновить список" Command="{Binding LoadTablesCommand}" Padding="10 5"/>
         </StackPanel>
 
-        <!-- Список столов -->
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding Tables}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Width="100" Height="100" Margin="5" BorderBrush="Gray" BorderThickness="1"
-                            Background="{Binding Status, Converter={StaticResource StatusToBrushConverter}}">
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="{Binding TableNumber}" FontSize="20" HorizontalAlignment="Center"/>
-                            <TextBlock Text="{Binding Status}" HorizontalAlignment="Center" Margin="0 5 0 0"/>
-                            <TextBlock Text="{Binding Zone.ZoneName}" HorizontalAlignment="Center" FontStyle="Italic"/>
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <!-- Таблица столов -->
+        <DataGrid Grid.Row="1" 
+                  ItemsSource="{Binding Tables}" 
+                  AutoGenerateColumns="False"
+                  SelectionMode="Single"
+                  SelectedItem="{Binding SelectedTable}"
+                  IsReadOnly="True"
+                  HeadersVisibility="Column"
+                  RowHeaderWidth="0"
+                  GridLinesVisibility="None">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="№" Binding="{Binding TableId}" Width="60"/>
+                <DataGridTextColumn Header="Зона" Binding="{Binding Zone.ZoneName}" Width="*"/>
+                <DataGridTextColumn Header="Статус" Binding="{Binding Status.StatusName}" Width="120"/>
+            </DataGrid.Columns>
+        </DataGrid>
 
-        <!-- Форма бронирования -->
-        <Border Grid.Row="2" BorderBrush="LightGray" BorderThickness="0,1,0,0" Margin="0 10 0 0" Padding="0 10 0 0">
+        <!-- Панель бронирования -->
+        <Border Grid.Row="2" BorderBrush="LightGray" BorderThickness="0,1,0,0" Padding="0 10 0 0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -49,19 +49,34 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Margin="0 0 10 0">
-                    <TextBlock Text="Выберите клиента:" Margin="0 0 0 5"/>
-                    <ComboBox ItemsSource="{Binding Customers}" DisplayMemberPath="FullName"
-                              SelectedItem="{Binding SelectedCustomer}" Width="200"/>
+                <!-- Выбор клиента -->
+                <StackPanel Grid.Column="0" Margin="0 0 20 0">
+                    <TextBlock Text="Клиент:" Margin="0 0 0 5"/>
+                    <ComboBox ItemsSource="{Binding Customers}" 
+                              DisplayMemberPath="FullName"
+                              SelectedItem="{Binding SelectedCustomer}" 
+                              Width="200"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1">
-                    <TextBlock Text="Выберите стол:" Margin="0 0 0 5"/>
-                    <TextBlock Text="{Binding SelectedTable.TableNumber}" FontWeight="Bold"/>
+                <!-- Информация о выбранном столе -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel Margin="0 0 20 0">
+                        <TextBlock Text="Выбран стол:" Margin="0 0 0 5"/>
+                        <TextBlock Text="{Binding SelectedTable.TableId}" FontWeight="Bold" FontSize="16"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="Текущий статус:" Margin="0 0 0 5"/>
+                        <TextBlock Text="{Binding SelectedTable.Status.StatusName}" FontStyle="Italic"/>
+                    </StackPanel>
                 </StackPanel>
 
-                <Button Grid.Column="2" Content="Забронировать" Command="{Binding ReserveTableCommand}"
-                        VerticalAlignment="Bottom" Padding="15 5" Margin="10 0 0 0"/>
+                <!-- Кнопка бронирования -->
+                <Button Grid.Column="2" 
+                        Content="Забронировать" 
+                        Command="{Binding ReserveTableCommand}"
+                        Padding="20 5" 
+                        VerticalAlignment="Center"
+                        FontWeight="Bold"/>
             </Grid>
         </Border>
     </Grid>

@@ -45,16 +45,16 @@ namespace RestarauntSystem.WPF.ViewModel
                 var orders = await _orderService.GetActiveOrdersAsync();
                 var tables = await _tableService.GetAllTablesAsync();
 
-                _orders.Clear();
+                Orders.Clear();
                 foreach (var order in orders)
                 {
-                    _orders.Add(order);
+                    Orders.Add(order);
                 }
 
-                _tables.Clear();
+                Tables.Clear();
                 foreach (var table in tables)
                 {
-                    _tables.Add(table);
+                    Tables.Add(table);
                 }
             }
             catch (Exception ex)
@@ -74,8 +74,8 @@ namespace RestarauntSystem.WPF.ViewModel
             try
             {
                 var order = await _orderService.CreateOrderAsync(SelectedTable.TableId, CurrentEmployee?.EmployeeId);
-                _orders.Add(order);
-                _selectedOrder = order;
+                Orders.Add(order);
+                SelectedOrder = order;
             }
             catch (Exception ex)
             {
@@ -85,11 +85,11 @@ namespace RestarauntSystem.WPF.ViewModel
 
         private async Task CompleteOrderAsync()
         {
-            if (_selectedOrder == null) return;
+            if (SelectedOrder == null) return;
 
             try
             {
-                await _orderService.CompleteOrderAsync(_selectedOrder.OrderId);
+                await _orderService.CompleteOrderAsync(SelectedOrder.OrderId);
                 await LoadOrdersAsync();
             }
             catch (Exception ex)
@@ -100,7 +100,7 @@ namespace RestarauntSystem.WPF.ViewModel
 
         private bool CanCompleteOrder()
         {
-            return _selectedOrder != null && _selectedOrder.StatusId == 4;
+            return SelectedOrder != null && SelectedOrder.StatusId == 4;
         }
 
         [ObservableProperty]

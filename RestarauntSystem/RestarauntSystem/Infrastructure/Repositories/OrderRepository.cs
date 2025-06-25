@@ -18,7 +18,11 @@ namespace RestarauntSystem.Infrastructure.Repositories
         public async Task<IEnumerable<Order>> GetAllAsync()
         {
             return await _context.Orders
+                .Include(o => o.Table)
+                .Include(o => o.Status) // Это ключевая строка!
                 .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Dish)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -59,7 +63,14 @@ namespace RestarauntSystem.Infrastructure.Repositories
         public async Task<IEnumerable<Order>> GetActiveOrdersAsync()
         {
             return await _context.Orders
-                .Where(o => o.StatusId == 2)
+                .Where(o => o.StatusId != 2)
+                .Include(o => o.Table)
+                    .ThenInclude(t => t.Zone)
+                .Include(o => o.Table)
+                    .ThenInclude(t => t.Status)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Dish)
+                .AsNoTracking()
                 .ToListAsync();
         }
         public async Task<IEnumerable<Order>> GetByStatusAsync(int statusId)
@@ -70,6 +81,7 @@ namespace RestarauntSystem.Infrastructure.Repositories
                 .ThenInclude(oi => oi.Dish)
                 .ToListAsync();
         }
+ 
         public async Task<Order> GetOrderWithItemsAsync(int id)
         {
             return await _context.Orders

@@ -10,17 +10,24 @@ namespace RestarauntSystem.Infrastructure.Repositories
     {
         private readonly RestaurantDbContext _context;
 
-        public ReservationRepository(RestaurantDbContext context)
-        {
-            _context = context;
-        }
+        public ReservationRepository(RestaurantDbContext context) => _context = context;
 
         public async Task<IEnumerable<Reservation>> GetAllAsync()
         {
             return await _context.Reservations
                 .Include(r => r.Customer)
-                .Include(r => r.Table)
                 .Include(r => r.ReservationStatus)
+                .Select(r => new Reservation
+                {
+                    ReservationId = r.ReservationId,
+                    CustomerId = r.CustomerId,
+                    Customer = r.Customer,
+                    StatusId = r.StatusId,
+                    ReservationStatus = r.ReservationStatus,
+                    ReservationTime = r.ReservationTime,
+                    TableId = r.TableId
+                })
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -42,13 +49,18 @@ namespace RestarauntSystem.Infrastructure.Repositories
 
         public async Task UpdateAsync(Reservation reservation)
         {
-            _context.Reservations.Update(reservation);
-            await _context.SaveChangesAsync();
+            var existing = await _context.Reservations.FindAsync(reservation.ReservationId);
+            if (existing != null)
+            {
+                _context.Entry(existing).CurrentValues.SetValues(reservation);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task DeleteAsync(int id)
         {
-            var reservation = await GetByIdAsync(id);
+            var reservation = new Reservation { ReservationId = id };
+            _context.Reservations.Attach(reservation);
             _context.Reservations.Remove(reservation);
             await _context.SaveChangesAsync();
         }
@@ -56,6 +68,7 @@ namespace RestarauntSystem.Infrastructure.Repositories
         public async Task<IEnumerable<Reservation>> GetByCustomerAsync(int customerId)
         {
             return await _context.Reservations
+                .AsNoTracking()
                 .Where(r => r.CustomerId == customerId)
                 .ToListAsync();
         }
@@ -63,15 +76,17 @@ namespace RestarauntSystem.Infrastructure.Repositories
         public async Task<IEnumerable<Reservation>> GetByDateAsync(DateTime date)
         {
             return await _context.Reservations
+                .AsNoTracking()
                 .Where(r => r.ReservationTime.Date == date.Date)
                 .ToListAsync();
         }
 
         public async Task ChangeReservationStatusAsync(int reservationId, int statusId)
         {
-            var reservation = await GetByIdAsync(reservationId);
-            reservation.StatusId = statusId;
-            await UpdateAsync(reservation);
+            var reservation = new Reservation { ReservationId = reservationId, StatusId = statusId };
+            _context.Reservations.Attach(reservation);
+            _context.Entry(reservation).Property(x => x.StatusId).IsModified = true;
+            await _context.SaveChangesAsync();
         }
     }
 }

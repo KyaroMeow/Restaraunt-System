@@ -14,7 +14,6 @@
 
         <!-- Фильтры -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0 0 0 10">
-            <DatePicker SelectedDate="{Binding ReservationDate}" Width="150" Margin="0 0 10 0"/>
             <Button Content="Обновить" Command="{Binding LoadReservationsCommand}" Margin="0 0 10 0"/>
         </StackPanel>
 
@@ -23,21 +22,10 @@
                   AutoGenerateColumns="False" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Клиент" Binding="{Binding Customer.FullName}" Width="*"/>
-                <DataGridTextColumn Header="Стол" Binding="{Binding Table.TableNumber}" Width="Auto"/>
+                <DataGridTextColumn Header="Стол" Binding="{Binding TableId}" Width="Auto"/>
                 <DataGridTextColumn Header="Дата/время" 
                                    Binding="{Binding ReservationTime, StringFormat=dd.MM.yyyy HH:mm}" 
                                    Width="Auto"/>
-                <DataGridTextColumn Header="Статус" Binding="{Binding Status.StatusName}" Width="Auto"/>
-                <DataGridTemplateColumn Width="Auto">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Content="Отменить" Command="{Binding DataContext.CancelReservationCommand, 
-                                    RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                    Padding="5 2" Visibility="{Binding Status.StatusId, 
-                                    Converter={StaticResource StatusToVisibilityConverter}}"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

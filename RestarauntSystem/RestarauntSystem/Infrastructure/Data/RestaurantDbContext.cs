@@ -40,6 +40,7 @@ namespace RestarauntSystem.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            ConvertToSnakeCase(modelBuilder);
             base.OnModelCreating(modelBuilder);
 
             // Применение всех конфигураций из сборки
@@ -64,27 +65,29 @@ namespace RestarauntSystem.Infrastructure.Data
                 .WithOne(p => p.Inventory)
                 .HasForeignKey<Inventory>(i => i.ProductId);
 
+
+
+
+            // Конфигурация для Reservation
+            modelBuilder.Entity<Reservation>(entity =>
+            {
+                entity.HasOne(r => r.ReservationStatus) // Связь с ReservationStatus
+                      .WithMany(s => s.Reservations)
+                      .HasForeignKey(r => r.StatusId)
+                      .HasConstraintName("reservations_status_id_fkey");
+            });
+
             // Настройка каскадного удаления
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.OrderItems)
                 .WithOne(oi => oi.Order)
                 .OnDelete(DeleteBehavior.Cascade);
-
             // Настройка индексов
             modelBuilder.Entity<Order>()
                 .HasIndex(o => o.OrderTime);
 
             modelBuilder.Entity<Reservation>()
                 .HasIndex(r => r.ReservationTime);
-
-            // Настройка значений по умолчанию
-            modelBuilder.Entity<Order>()
-                .Property(o => o.OrderTime)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-            modelBuilder.Entity<Delivery>()
-                .Property(d => d.DeliveryTime)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             // Настройка ограничений
             modelBuilder.Entity<DishComponent>()
@@ -94,14 +97,38 @@ namespace RestarauntSystem.Infrastructure.Data
             modelBuilder.Entity<Review>()
                 .Property(r => r.Rating)
                 .HasAnnotation("Range", new[] { 1, 5 });
+
+            modelBuilder.Entity<Employee>()
+            .Property(e => e.MiddleName)
+            .IsRequired(false);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Host=localhost;Database=restaraunt_db;Username=postgres;Password=sa");
+                optionsBuilder.UseNpgsql("Host=localhost;Database=restaurant_db;Username=postgres;Password=sa");
             }
+        }
+        private void ConvertToSnakeCase(ModelBuilder modelBuilder)
+        {
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+
+                // Преобразование имен столбцов
+                foreach (var property in entity.GetProperties())
+                {
+                    property.SetColumnName(ToSnakeCase(property.GetColumnName()));
+                }
+            }
+        }
+        private string ToSnakeCase(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+
+            return string.Concat(input.Select((c, i) =>
+                i > 0 && char.IsUpper(c) ? "_" + c.ToString() : c.ToString()))
+                .ToLower();
         }
     }
 }

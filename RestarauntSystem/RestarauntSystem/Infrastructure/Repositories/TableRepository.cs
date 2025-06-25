@@ -18,9 +18,19 @@ namespace RestarauntSystem.Infrastructure.Repositories
         public async Task<IEnumerable<Table>> GetAllAsync()
         {
             return await _context.Tables
-                .Include(t => t.Zone)
-                .Include(t => t.Status)
-                .ToListAsync();
+        .Include(t => t.Zone)
+        .Include(t => t.Status)
+        .Select(t => new Table // Явная проекция без Reservations
+        {
+            TableId = t.TableId,
+            ZoneId = t.ZoneId,
+            StatusId = t.StatusId,
+            Zone = t.Zone,
+            Status = t.Status
+            // Намеренно не включаем Reservations!
+        })
+        .AsNoTracking()
+        .ToListAsync();
         }
 
         public async Task<Table> GetByIdAsync(int id)
@@ -61,10 +71,13 @@ namespace RestarauntSystem.Infrastructure.Repositories
         public async Task<IEnumerable<Table>> GetAvailableTablesAsync(DateTime date)
         {
             return await _context.Tables
-                .Where(t => t.Status.StatusName == "Available" ||
-                           !_context.Reservations.Any(r =>
-                               r.TableId == t.TableId &&
-                               r.ReservationTime.Date == date.Date))
+                .Include(t => t.Status) // Явно включаем статус
+                .Where(t => t.StatusId == 1) // ID статуса "Available" (лучше использовать константу)
+                .Where(t => !_context.Reservations
+                    .Where(r => r.ReservationTime.Date == date.Date)
+                    .Select(r => r.TableId)
+                    .Contains(t.TableId))
+                .AsNoTracking()
                 .ToListAsync();
         }
 

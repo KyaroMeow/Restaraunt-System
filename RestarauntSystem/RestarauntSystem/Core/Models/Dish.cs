@@ -16,6 +16,7 @@ namespace RestarauntSystem.Core.Models
         public int DishId { get; set; }
         public string DishName { get; set; }
         public string Description { get; set; }
+        [ForeignKey("DishCategory")]
         public int? CategoryId { get; set; }
         public decimal Price { get; set; }
 

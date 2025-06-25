@@ -4,19 +4,23 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:RestarauntSystem.WPF.Views"
+             xmlns:converter="clr-namespace:RestarauntSystem.WPF.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converter:OrderStatusToTextConverter x:Key="OrderStatusToTextConverter"/>
+    </UserControl.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
 
         <!-- Панель управления -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0 0 0 10">
             <Button Content="Обновить" Command="{Binding LoadOrdersCommand}" Margin="0 0 10 0"/>
-            <ComboBox ItemsSource="{Binding Tables}" DisplayMemberPath="TableNumber"
+            <ComboBox ItemsSource="{Binding Tables}" DisplayMemberPath="TableId"
                       SelectedItem="{Binding SelectedTable}" Width="120" Margin="0 0 10 0"/>
             <Button Content="Создать заказ" Command="{Binding CreateOrderCommand}"/>
         </StackPanel>
@@ -26,10 +30,10 @@
                   AutoGenerateColumns="False" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Номер" Binding="{Binding OrderId}" Width="Auto"/>
-                <DataGridTextColumn Header="Стол" Binding="{Binding Table.TableNumber}" Width="Auto"/>
-                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="*"/>
+                <DataGridTextColumn Header="Стол" Binding="{Binding TableId}" Width="Auto"/>
+                <DataGridTextColumn Header="Статус" 
+                                   Binding="{Binding StatusId, Converter={StaticResource OrderStatusToTextConverter}}" Width="*"/>
                 <DataGridTextColumn Header="Время" Binding="{Binding OrderTime, StringFormat=HH:mm}" Width="Auto"/>
-                <DataGridTextColumn Header="Сумма" Binding="{Binding Total, StringFormat={}{0:C}}" Width="Auto"/>
             </DataGrid.Columns>
         </DataGrid>
 
@@ -51,9 +55,8 @@
 
                 <StackPanel Grid.Column="1" Margin="10 0 0 0">
                     <Button Content="Завершить заказ" Command="{Binding CompleteOrderCommand}"
-                            Margin="0 0 0 10" Padding="10 5" FontWeight="Bold"/>
-                    <Button Content="Отменить заказ" Command="{Binding CancelOrderCommand}"
-                            Padding="10 5" Background="#FFFFDDDD"/>
+                            Margin="0 0 0 10" Padding="10 20" FontWeight="Bold" />
+
                 </StackPanel>
             </Grid>
         </Border>

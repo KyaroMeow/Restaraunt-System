@@ -58,9 +58,14 @@ namespace RestarauntSystem.Infrastructure.Services
             return await _reservationRepository.GetByCustomerAsync(customerId);
         }
 
+
         public async Task<IEnumerable<Reservation>> GetReservationsByDateAsync(DateTime date)
         {
             return await _reservationRepository.GetByDateAsync(date);
+        }
+        public async Task<IEnumerable<Reservation>> GetAllReservationsAsync()
+        {
+            return await _reservationRepository.GetAllAsync();
         }
 
         public async Task<Reservation> GetReservationDetailsAsync(int reservationId)

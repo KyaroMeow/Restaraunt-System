@@ -21,7 +21,7 @@ namespace RestarauntSystem.WPF
             // 1. Регистрация контекста базы данных
             services.AddDbContext<RestaurantDbContext>(options =>
             {
-                options.UseNpgsql("Host=localhost;Database=restaraunt_db;Username=postgres;Password=sa");
+                options.UseNpgsql("Host=localhost;Database=restaurant_db;Username=postgres;Password=sa");
             });
 
             // 2. Регистрация репозиториев

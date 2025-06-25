@@ -51,7 +51,7 @@ namespace RestarauntSystem.WPF.ViewModel
         {
             try
             {
-                var reservations = await _reservationService.GetReservationsByDateAsync(DateTime.Today);
+                var reservations = await _reservationService.GetAllReservationsAsync();
                 var customers = await _customerService.GetAllAsync();
                 var tables = await _tableService.GetAllTablesAsync();
 

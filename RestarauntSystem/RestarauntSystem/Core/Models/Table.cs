@@ -8,20 +8,24 @@ using System.Threading.Tasks;
 
 namespace RestarauntSystem.Core.Models
 {
+    [Table("tables")]
     public class Table
     {
         [Key]
+        [Column("table_id")]
         public int TableId { get; set; }
 
         [ForeignKey("Zone")]
+        [Column("zone_id")]
         public int? ZoneId { get; set; }
         public Zone Zone { get; set; }
 
-        [ForeignKey("Status")]
+        // Это статус СТОЛА (не резервации)
+        [ForeignKey("TableStatus")]
+        [Column("status_id")] // Связь с table_status
         public int? StatusId { get; set; }
         public TableStatus Status { get; set; }
 
         public ICollection<Order> Orders { get; set; }
-        public ICollection<Reservation> Reservations { get; set; }
     }
 }
