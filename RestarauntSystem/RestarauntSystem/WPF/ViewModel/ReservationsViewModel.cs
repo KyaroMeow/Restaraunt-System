@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using RestarauntSystem.Core.Models;
+using RestarauntSystem.Core.Services;
+using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace RestarauntSystem.WPF.ViewModel
 {
@@ -50,7 +51,7 @@ namespace RestarauntSystem.WPF.ViewModel
         {
             try
             {
-                var reservations = await _reservationService.GetByDateAsync(DateTime.Today);
+                var reservations = await _reservationService.GetReservationsByDateAsync(DateTime.Today);
                 var customers = await _customerService.GetAllAsync();
                 var tables = await _tableService.GetAllTablesAsync();
 
@@ -107,7 +108,7 @@ namespace RestarauntSystem.WPF.ViewModel
             try
             {
                 await _reservationService.CancelReservationAsync(SelectedReservation.ReservationId);
-                SelectedReservation.StatusId = (int)ReservationStatus.Cancelled;
+                SelectedReservation.StatusId = 2;
                 MessageBox.Show("Бронирование отменено", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)

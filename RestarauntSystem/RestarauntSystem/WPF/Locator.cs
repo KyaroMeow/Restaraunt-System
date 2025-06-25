@@ -1,18 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using RestarauntSystem.Infrastructure.Data;
+using RestarauntSystem.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
-using RestarauntSystem.Core.Models;
 using RestarauntSystem.Core.Repositories;
 using RestarauntSystem.Core.Services;
 using RestarauntSystem.Infrastructure.Repositories;
-using RestarauntSystem.Infrastructure.Services;
-using System.Reflection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Navigation;
+using RestarauntSystem.WPF.ViewModel;
+
 
 namespace RestarauntSystem.WPF
 {
@@ -45,6 +39,12 @@ namespace RestarauntSystem.WPF
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<IReservationService, ReservationService>();
             services.AddTransient<IInventoryService, InventoryService>();
+            services.AddTransient<IDishService, DishService>();
+            services.AddTransient<IDishCategoryService, DishCategoryService>();
+            services.AddTransient<IPositionService, PositionService>();
+            services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<ISupplierService, SupplierService>();
+            services.AddTransient<ICustomerService, CustomerService>();
 
             // 4. Регистрация ViewModels
             services.AddTransient<MainViewModel>();
@@ -70,7 +70,6 @@ namespace RestarauntSystem.WPF
         public ReservationsViewModel ReservationsViewModel => _serviceProvider.GetRequiredService<ReservationsViewModel>();
         public EmployeesViewModel EmployeesViewModel => _serviceProvider.GetRequiredService<EmployeesViewModel>();
         public InventoryViewModel InventoryViewModel => _serviceProvider.GetRequiredService<InventoryViewModel>();
-        public ReportsViewModel ReportsViewModel => _serviceProvider.GetRequiredService<ReportsViewModel>();
 
         // 7. Метод для ручного разрешения зависимостей
         public static T GetService<T>() where T : class

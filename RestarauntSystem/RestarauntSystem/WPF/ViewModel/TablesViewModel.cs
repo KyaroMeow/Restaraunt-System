@@ -98,7 +98,7 @@ namespace RestarauntSystem.WPF.ViewModel
         private bool CanReleaseTable()
         {
             return _selectedTable != null &&
-                   _selectedTable.StatusId == (int)TableStatus.Occupied;
+                   _selectedTable.StatusId == 3;
         }
 
         [ObservableProperty]

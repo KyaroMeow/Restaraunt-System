@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using RestarauntSystem.Core.Models;
+using RestarauntSystem.Core.Services;
+using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace RestarauntSystem.WPF.ViewModel
 {
@@ -36,14 +37,13 @@ namespace RestarauntSystem.WPF.ViewModel
             LoadEmployeesCommand = new AsyncRelayCommand(LoadEmployeesAsync);
             AddEmployeeCommand = new AsyncRelayCommand(AddEmployeeAsync);
             UpdateEmployeeCommand = new AsyncRelayCommand(UpdateEmployeeAsync);
-            DeleteEmployeeCommand = new AsyncRelayCommand(DeleteEmployeeAsync);
         }
 
         private async Task LoadEmployeesAsync()
         {
             try
             {
-                var employees = await _employeeService.GetAllAsync();
+                var employees = await _employeeService.GetAllEmployeesAsync();
                 var positions = await _positionService.GetAllAsync();
 
                 Employees.Clear();
@@ -86,7 +86,7 @@ namespace RestarauntSystem.WPF.ViewModel
                     Email = NewEmployeeEmail
                 };
 
-                await _employeeService.CreateAsync(employee);
+                await _employeeService.CreateEmployeeAsync(employee);
                 Employees.Add(employee);
 
                 // Сброс формы
@@ -111,7 +111,7 @@ namespace RestarauntSystem.WPF.ViewModel
 
             try
             {
-                await _employeeService.UpdateAsync(SelectedEmployee);
+                await _employeeService.UpdateEmployeeAsync(SelectedEmployee);
                 MessageBox.Show("Данные сотрудника обновлены", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
@@ -120,21 +120,6 @@ namespace RestarauntSystem.WPF.ViewModel
             }
         }
 
-        private async Task DeleteEmployeeAsync()
-        {
-            if (SelectedEmployee == null) return;
-
-            try
-            {
-                await _employeeService.DeleteAsync(SelectedEmployee.EmployeeId);
-                Employees.Remove(SelectedEmployee);
-                MessageBox.Show("Сотрудник удален", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при удалении сотрудника: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
 
         [ObservableProperty]
         private Position _selectedPosition;

@@ -14,7 +14,7 @@ namespace RestarauntSystem.WPF.ViewModel
         private readonly ISupplierService _supplierService;
 
         [ObservableProperty]
-        private ObservableCollection<InventoryItem> _inventoryItems;
+        private ObservableCollection<Inventory> _inventoryItems;
 
         [ObservableProperty]
         private ObservableCollection<Product> _products;
@@ -23,7 +23,7 @@ namespace RestarauntSystem.WPF.ViewModel
         private ObservableCollection<Supplier> _suppliers;
 
         [ObservableProperty]
-        private InventoryItem _selectedInventoryItem;
+        private Inventory _selectedInventoryItem;
 
         public IAsyncRelayCommand LoadInventoryCommand { get; }
         public IAsyncRelayCommand UpdateStockCommand { get; }
@@ -44,7 +44,6 @@ namespace RestarauntSystem.WPF.ViewModel
 
             LoadInventoryCommand = new AsyncRelayCommand(LoadInventoryAsync);
             UpdateStockCommand = new AsyncRelayCommand(UpdateStockAsync);
-            OrderSuppliesCommand = new AsyncRelayCommand(OrderSuppliesAsync);
         }
 
         private async Task LoadInventoryAsync()
@@ -89,7 +88,7 @@ namespace RestarauntSystem.WPF.ViewModel
 
             try
             {
-                await _inventoryService.UpdateStockAsync(
+                await _inventoryService.UpdateInventoryAsync(
                     SelectedInventoryItem.ProductId,
                     StockAdjustment);
 
@@ -103,27 +102,7 @@ namespace RestarauntSystem.WPF.ViewModel
             }
         }
 
-        private async Task OrderSuppliesAsync()
-        {
-            if (SelectedProduct == null || SelectedSupplier == null || OrderQuantity <= 0)
-            {
-                MessageBox.Show("Выберите товар, поставщика и укажите количество", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
 
-            try
-            {
-                // Логика заказа у поставщика
-                await _inventoryService.UpdateStockAsync(SelectedProduct.ProductId, OrderQuantity);
-                await LoadInventoryAsync();
-                MessageBox.Show($"Заказано {OrderQuantity} единиц товара", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                OrderQuantity = 0;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при оформлении заказа: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
 
         [ObservableProperty]
         private Product _selectedProduct;

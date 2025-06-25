@@ -1,12 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RestarauntSystem.Core.Models;
-using System;
-using System.Collections.Generic;
+using RestarauntSystem.Core.Services;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace RestarauntSystem.WPF.ViewModel
