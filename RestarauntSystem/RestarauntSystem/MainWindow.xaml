@@ -5,8 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RestarauntSystem"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="RestarauntSystem" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
+        <!-- Панель управления -->
+        <DockPanel Grid.Row="0" Margin="5">
+            <!-- Кнопки -->
+            <Button Content="Удалить" Width="80" Margin="5" Command="{Binding DeleteCommand}"/>
+            <Button Content="Добавить" Width="80" Margin="5" Command="{Binding AddCommand}"/>
+            <Button Content="Изменить" Width="80" Margin="5" Command="{Binding EditCommand}"/>
+            <Button Content="Обновить" Width="80" Margin="5" Command="{Binding RefreshCommand}"/>
+            <Button Content="Импорт" Width="80" Margin="5" Command="{Binding ImportCommand}"/>
+            <Button Content="Экспорт" Width="80" Margin="5" Command="{Binding ExportCommand}"/>
+
+            <!-- ComboBox для выбора таблицы -->
+            <ComboBox Width="150" Margin="5" HorizontalAlignment = "Right"
+                      ItemsSource="{Binding TableNames}" 
+                      SelectedItem="{Binding SelectedTableName}"/>
+        </DockPanel>
+
+        <!-- Таблица данных -->
+        <DataGrid Grid.Row="1" Margin="5"
+                  ItemsSource="{Binding CurrentTable}"
+                  AutoGenerateColumns="True"
+                  CanUserAddRows="False"/>
     </Grid>
 </Window>
