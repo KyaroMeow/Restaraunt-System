@@ -3,9 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converter="clr-namespace:RestarauntSystem.WPF.Converters"
              xmlns:local="clr-namespace:RestarauntSystem.WPF.Views"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converter:DishCategoryIdToText x:Key="DishCategoryIdToText"/>
+    </UserControl.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -23,7 +27,7 @@
                   AutoGenerateColumns="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Название" Binding="{Binding DishName}" Width="Auto"/>
-                <DataGridTextColumn Header="Категория" Binding="{Binding Category.CategoryName}" Width="Auto"/>
+                <DataGridTextColumn Header="Категория" Binding="{Binding CategoryId, Converter={StaticResource DishCategoryIdToText}}" Width="Auto"/>
                 <DataGridTextColumn Header="Цена" Binding="{Binding Price, StringFormat={}{0:C}}" Width="Auto"/>
             </DataGrid.Columns>
         </DataGrid>
@@ -53,7 +57,6 @@
 
                 <StackPanel Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right">
                     <Button Content="Добавить" Command="{Binding AddDishCommand}" Margin="0 0 0 10" Padding="15 5"/>
-                    <Button Content="Обновить" Command="{Binding UpdateDishCommand}" Margin="0 0 0 10" Padding="15 5"/>
                     <Button Content="Удалить" Command="{Binding DeleteDishCommand}" Padding="15 5" Background="#FFFFDDDD"/>
                 </StackPanel>
             </Grid>
