@@ -68,6 +68,9 @@ namespace RestarauntSystem.WPF
             // 5. Специальные сервисы
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IDialogService, DialogService>();
+            services.AddSingleton<JsonExportService>();
+            services.AddSingleton<JsonImportService>();
+            services.AddSingleton<DatabaseService>();
 
             _serviceProvider = services.BuildServiceProvider();
         }

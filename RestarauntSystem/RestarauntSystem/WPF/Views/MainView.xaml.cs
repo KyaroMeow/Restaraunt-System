@@ -23,5 +23,6 @@ namespace RestarauntSystem.WPF.Views
         {
             InitializeComponent();
         }
+
     }
 }
