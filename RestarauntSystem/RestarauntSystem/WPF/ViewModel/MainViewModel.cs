@@ -4,32 +4,36 @@ using RestarauntSystem.Infrastructure.Services;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Dapper;
+using Microsoft.Win32;
+using RestarauntSystem.Infrastructure.Interfaces;
+using System.Text;
 
 namespace RestarauntSystem.WPF.ViewModel
 {
     public partial class MainViewModel : ObservableObject
     {
         private readonly DatabaseService _dbService;
-        private readonly JsonExportService _exportService;
-        private readonly JsonImportService _importService;
+        private readonly IJsonAdapter<DataTable> _jsonAdapter;
 
-        public MainViewModel()
+        public MainViewModel(DatabaseService dbService, IJsonAdapter<DataTable> jsonAdapter)
         {
-            _dbService = new DatabaseService();
-            _exportService = new JsonExportService();
-            _importService = new JsonImportService();
+            _dbService = dbService;
+            _jsonAdapter = jsonAdapter;
 
-            // Инициализация команд
+            InitializeCommands();
+            LoadTableNamesAsync();
+        }
+        private void InitializeCommands()
+        {
             DeleteCommand = new AsyncRelayCommand(DeleteRecordAsync);
             SaveCommand = new AsyncRelayCommand(SaveChangesAsync);
             ImportCommand = new AsyncRelayCommand(ImportDataAsync);
             ExportCommand = new AsyncRelayCommand(ExportDataAsync);
             RefreshCommand = new AsyncRelayCommand(RefreshDataAsync);
-
-            LoadTableNamesAsync();
         }
 
         // Свойства
@@ -46,11 +50,11 @@ namespace RestarauntSystem.WPF.ViewModel
         private DataRowView _selectedRow;
 
         // Команды (явное определение без атрибутов)
-        public IAsyncRelayCommand DeleteCommand { get; }
-        public IAsyncRelayCommand SaveCommand { get; }
-        public IAsyncRelayCommand ImportCommand { get; }
-        public IAsyncRelayCommand ExportCommand { get; }
-        public IAsyncRelayCommand RefreshCommand { get; }
+        public IAsyncRelayCommand DeleteCommand { get; private set; }
+        public IAsyncRelayCommand SaveCommand { get; private set; }
+        public IAsyncRelayCommand ImportCommand { get; private set; }
+        public IAsyncRelayCommand ExportCommand { get; private set; }
+        public IAsyncRelayCommand RefreshCommand { get; private set; }
 
         // Обработчик изменения выбранной таблицы
         partial void OnSelectedTableNameChanged(string value)
@@ -146,28 +150,68 @@ namespace RestarauntSystem.WPF.ViewModel
             }
         }
 
-        private async Task ImportDataAsync()
+        public async Task ImportDataAsync()
         {
             try
             {
-                var openDialog = new Microsoft.Win32.OpenFileDialog
+                var openDialog = new OpenFileDialog
                 {
                     Filter = "JSON files (*.json)|*.json",
-                    InitialDirectory = System.Environment.GetFolderPath(
-                        System.Environment.SpecialFolder.MyDocuments)
+                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
                 };
 
                 if (openDialog.ShowDialog() == true)
                 {
-                    var importedData = await _importService.ImportFromFileAsync(openDialog.FileName);
-                    await _dbService.ImportDataAsync(CurrentTable.TableName, importedData);
-                    await RefreshDataAsync();
-                    MessageBox.Show($"Импортировано {importedData.Count} записей");
+                    string json = await File.ReadAllTextAsync(openDialog.FileName);
+                    DataTable importedData = _jsonAdapter.Deserialize(json);
+
+                    // Проверка структуры (сравниваем только имена колонок без учёта регистра)
+                    var currentColumns = CurrentTable.Columns.Cast<DataColumn>()
+                        .Select(c => c.ColumnName.ToLower()).ToList();
+
+                    var importedColumns = importedData.Columns.Cast<DataColumn>()
+                        .Select(c => c.ColumnName.ToLower()).ToList();
+
+                    if (!currentColumns.SequenceEqual(importedColumns))
+                    {
+                        // Детальное сообщение об ошибке
+                        var errorMsg = new StringBuilder();
+                        errorMsg.AppendLine("Ошибка: структура таблицы не совпадает!");
+                        errorMsg.AppendLine($"Ожидаемые колонки: {string.Join(", ", currentColumns)}");
+                        errorMsg.AppendLine($"Полученные колонки: {string.Join(", ", importedColumns)}");
+
+                        MessageBox.Show(errorMsg.ToString());
+                        return;
+                    }
+
+                    // Копируем данные с проверкой типов
+                    foreach (DataRow importedRow in importedData.Rows)
+                    {
+                        DataRow newRow = CurrentTable.NewRow();
+
+                        foreach (DataColumn column in CurrentTable.Columns)
+                        {
+                            try
+                            {
+                                newRow[column.ColumnName] = importedRow[column.ColumnName];
+                            }
+                            catch
+                            {
+                                // Если тип не совпадает, преобразуем в строку
+                                object value = importedRow[column.ColumnName];
+                                newRow[column.ColumnName] = value != null ? value.ToString() : (object)DBNull.Value;
+                            }
+                        }
+
+                        CurrentTable.Rows.Add(newRow);
+                    }
+
+                    MessageBox.Show($"Добавлено {importedData.Rows.Count} строк");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка импорта: {ex.Message}");
+                MessageBox.Show($"Ошибка импорта: {ex.Message}\n\nДетали:\n{ex.InnerException?.Message}");
             }
         }
 
@@ -175,26 +219,18 @@ namespace RestarauntSystem.WPF.ViewModel
         {
             try
             {
-                var savePath = System.IO.Path.Combine(
-                    System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments),
-                    "RestaurantSystemExports");
-
-                var data = CurrentTable.AsEnumerable().Select(row =>
+                var saveDialog = new SaveFileDialog
                 {
-                    var dict = new Dictionary<string, object>();
-                    foreach (DataColumn column in CurrentTable.Columns)
-                    {
-                        dict[column.ColumnName] = row[column];
-                    }
-                    return dict;
-                }).ToList();
+                    Filter = "JSON files (*.json)|*.json",
+                    FileName = $"{CurrentTable.TableName}_export.json",
+                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                };
 
-                await _exportService.ExportToFileAsync(
-                    CurrentTable.TableName,
-                    data,
-                    savePath);
-
-                MessageBox.Show($"Данные экспортированы в {savePath}");
+                if (saveDialog.ShowDialog() == true)
+                {
+                    await _jsonAdapter.ExportToFileAsync(CurrentTable, saveDialog.FileName);
+                    MessageBox.Show($"Данные экспортированы в {saveDialog.FileName}");
+                }
             }
             catch (Exception ex)
             {

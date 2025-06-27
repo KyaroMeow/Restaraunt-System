@@ -1,16 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using RestarauntSystem.Infrastructure.Data;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using System.Linq.Expressions;
-using Dapper;
+﻿using Dapper;
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using System.Configuration;
+using System.Data;
 
 namespace RestarauntSystem.Infrastructure.Services
 {
@@ -299,4 +291,4 @@ namespace RestarauntSystem.Infrastructure.Services
             }
         }
     }
-    }
+}
